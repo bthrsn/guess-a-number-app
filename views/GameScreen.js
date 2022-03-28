@@ -23,10 +23,11 @@ let minBoundary = 1;
 let maxBoundary = 100;
 
 function gameScreen({ userNumber, onGameOver }) {
-  const initialGuess = useMemo(
-    () => generateRandomBetween(minBoundary, maxBoundary, userNumber),
-    [minBoundary, maxBoundary, userNumber]
-  );
+  const initialGuess = generateRandomBetween(1, 100, userNumber);
+  // const initialGuess = useMemo(
+  //   () => generateRandomBetween(minBoundary, maxBoundary, userNumber),
+  //   [minBoundary, maxBoundary, userNumber]
+  // );
   const [currentGuess, setCurrentGuess] = useState(initialGuess);
   const [guessRounds, setGuessRounds] = useState([initialGuess]);
 
