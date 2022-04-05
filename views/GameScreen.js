@@ -1,4 +1,4 @@
-import { View, StyleSheet, Alert, Text, FlatList } from "react-native";
+import { View, StyleSheet, Alert, FlatList, useWindowDimensions } from "react-native";
 import React, { useState, useEffect, useMemo } from "react";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -30,6 +30,7 @@ function gameScreen({ userNumber, onGameOver }) {
   // );
   const [currentGuess, setCurrentGuess] = useState(initialGuess);
   const [guessRounds, setGuessRounds] = useState([initialGuess]);
+  const { width, height } = useWindowDimensions();
 
   useEffect(() => {
     if (currentGuess === userNumber) {
@@ -48,9 +49,7 @@ function gameScreen({ userNumber, onGameOver }) {
       (direction === "lower" && currentGuess < userNumber) ||
       (direction === "greater" && currentGuess > userNumber)
     ) {
-      Alert.alert("Don't lie", "You know that this is wrong...", [
-        { text: "Sorry", style: "cancel" },
-      ]);
+      Alert.alert("Don't lie", "You know that this is wrong...", [{ text: "Sorry", style: "cancel" }]);
       return;
     }
     if (direction === "lower") {
@@ -58,25 +57,18 @@ function gameScreen({ userNumber, onGameOver }) {
     } else {
       minBoundary = currentGuess + 1;
     }
-    const newRndNumber = generateRandomBetween(
-      minBoundary,
-      maxBoundary,
-      currentGuess
-    );
+    const newRndNumber = generateRandomBetween(minBoundary, maxBoundary, currentGuess);
     setCurrentGuess(newRndNumber);
-    setGuessRounds((prevGuessRounds) => [newRndNumber, ...prevGuessRounds]);
+    setGuessRounds(prevGuessRounds => [newRndNumber, ...prevGuessRounds]);
   }
 
   const guessRoundsListLength = guessRounds.length;
 
-  return (
-    <View style={styles.screen}>
-      <Title>Opponent's Guess</Title>
+  let content = (
+    <>
       <NumberContainer>{currentGuess}</NumberContainer>
       <Card>
-        <InstructionText style={styles.InstructionText}>
-          Higher or Lower?
-        </InstructionText>
+        <InstructionText style={styles.InstructionText}>Higher or Lower?</InstructionText>
         <View style={styles.buttonsContainer}>
           <View style={styles.buttonContainer}>
             <PrimaryButton onPress={nextGuessHandler.bind(this, "lower")}>
@@ -90,17 +82,40 @@ function gameScreen({ userNumber, onGameOver }) {
           </View>
         </View>
       </Card>
+    </>
+  );
+
+  if (width > 500) {
+    content = (
+      <>
+        <View style={styles.buttonContainerWide}>
+          <View style={styles.buttonContainer}>
+            <PrimaryButton onPress={nextGuessHandler.bind(this, "lower")}>
+              <Ionicons name="md-remove" size={24} color="white" />
+            </PrimaryButton>
+          </View>
+          <NumberContainer>{currentGuess}</NumberContainer>
+          <View style={styles.buttonContainer}>
+            <PrimaryButton onPress={nextGuessHandler.bind(this, "greater")}>
+              <Ionicons name="md-add" size={24} color="white" />
+            </PrimaryButton>
+          </View>
+        </View>
+      </>
+    );
+  }
+
+  return (
+    <View style={styles.screen}>
+      <Title>Opponent's Guess</Title>
+      {content}
       <View style={styles.listContainer}>
         <FlatList
           data={guessRounds}
-          renderItem={(itemData) => (
-            <GuessLogItem
-              roundNumber={guessRoundsListLength - itemData.index}
-              guess={itemData.item}
-            />
+          renderItem={itemData => (
+            <GuessLogItem roundNumber={guessRoundsListLength - itemData.index} guess={itemData.item} />
           )}
-          keyExtractor={(item) => item}
-        ></FlatList>
+          keyExtractor={item => item}></FlatList>
       </View>
     </View>
   );
@@ -112,6 +127,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     padding: 24,
+    marginTop: 24,
   },
   InstructionText: {
     marginBottom: 12,
@@ -122,6 +138,10 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flex: 1,
+  },
+  buttonContainerWide: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   listContainer: {
     flex: 1,

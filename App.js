@@ -7,6 +7,7 @@ import StartGameScreen from "./views/StartGameScreen";
 import GameScreen from "./views/GameScreen";
 import GameEndScreen from "./views/GameEndScreen";
 import Colors from "./utils/colors";
+import { StatusBar } from "expo-status-bar";
 
 export default function App() {
   const [userNumber, setuserNumber] = useState(null);
@@ -38,35 +39,26 @@ export default function App() {
   let screen = <StartGameScreen onConfirmNumber={pickedNumberHandler} />;
 
   if (userNumber) {
-    screen = (
-      <GameScreen userNumber={userNumber} onGameOver={gameOverHandler} />
-    );
+    screen = <GameScreen userNumber={userNumber} onGameOver={gameOverHandler} />;
   }
 
   if (gameIsOver && userNumber) {
-    screen = (
-      <GameEndScreen
-        userNumber={userNumber}
-        roundsNumber={guessRounds}
-        onStartNewGame={startNewGameHandler}
-      />
-    );
+    screen = <GameEndScreen userNumber={userNumber} roundsNumber={guessRounds} onStartNewGame={startNewGameHandler} />;
   }
 
   return (
-    <LinearGradient
-      colors={[Colors.primary700, Colors.accent500]}
-      style={styles.rootScreen}
-    >
-      <ImageBackground
-        source={require("./assets/images/background.png")}
-        resizeMode="cover"
-        style={styles.rootScreen}
-        imageStyle={styles.backgroundImage}
-      >
-        <SafeAreaView style={styles.rootScreen}>{screen}</SafeAreaView>
-      </ImageBackground>
-    </LinearGradient>
+    <>
+      <StatusBar style="light" />
+      <LinearGradient colors={[Colors.primary700, Colors.accent500]} style={styles.rootScreen}>
+        <ImageBackground
+          source={require("./assets/images/background.png")}
+          resizeMode="cover"
+          style={styles.rootScreen}
+          imageStyle={styles.backgroundImage}>
+          <SafeAreaView style={styles.rootScreen}>{screen}</SafeAreaView>
+        </ImageBackground>
+      </LinearGradient>
+    </>
   );
 }
 
